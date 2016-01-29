@@ -53,20 +53,37 @@ let socket = new Socket("/socket", {params: {token: window.userToken}})
 
 socket.connect()
 
+let $display = $('#lat-lng');
+
 // Now that you are connected, you can join channels with a topic:
 let channel = socket.channel('game:lskjfw-12kl3j', {})
 channel.join()
   .receive('ok', resp => { console.log("Joined successfully", resp) })
   .receive('error', resp => { console.log("Unable to join", resp) })
 
-window.navigator.geolocation.watchPosition((position) => {
-  console.log('location', position.coords);
-  channel.push('location', {
-    coords: {
-      lat: position.coords.latitude,
-      lng: position.coords.longitude
-    }
+function queueTrackLocation() {
+  setTimeout(trackLocation, 2000);
+}
+
+function trackLocation() {
+  window.navigator.geolocation.getCurrentPosition((position) => {
+    console.log('location', position.coords);
+    $display.append('<p>' + position.coords.latitude + ', ' + position.coords.longitude + '</p>');
+    channel.push('location', {
+      coords: {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      }
+    });
+    queueTrackLocation();
+  }, (error) => {
+    console.log('error', error);
+    queueTrackLocation();
+  }, {
+    enableHighAccuracy: true
   });
-});
+}
+
+trackLocation();
 
 export default socket
