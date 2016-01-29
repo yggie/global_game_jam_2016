@@ -2,7 +2,7 @@ defmodule GlobalGameJam_2016.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "rooms:*", GlobalGameJam_2016.RoomChannel
+  channel "game:*", GlobalGameJam_2016.GameChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
