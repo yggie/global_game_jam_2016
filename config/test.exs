@@ -10,10 +10,10 @@ config :global_game_jam_2016, GlobalGameJam_2016.Endpoint,
 config :logger, level: :warn
 
 # Configure your database
-config :global_game_jam_2016, GlobalGameJam_2016.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "global_game_jam_2016_test",
-  hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
+# config :global_game_jam_2016, GlobalGameJam_2016.Repo,
+#   adapter: Ecto.Adapters.Postgres,
+#   username: "postgres",
+#   password: "postgres",
+#   database: "global_game_jam_2016_test",
+#   hostname: "localhost",
+#   pool: Ecto.Adapters.SQL.Sandbox
