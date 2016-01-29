@@ -53,10 +53,8 @@ let socket = new Socket("/socket", {params: {token: window.userToken}})
 
 socket.connect()
 
-let $display = $('#lat-lng');
-
 // Now that you are connected, you can join channels with a topic:
-let channel = socket.channel('game:lskjfw-12kl3j', {})
+let channel = socket.channel('game:public', {})
 channel.join()
   .receive('ok', resp => { console.log("Joined successfully", resp) })
   .receive('error', resp => { console.log("Unable to join", resp) })
@@ -67,8 +65,6 @@ function queueTrackLocation() {
 
 function trackLocation() {
   window.navigator.geolocation.getCurrentPosition((position) => {
-    console.log('location', position.coords);
-    $display.append('<p>' + position.coords.latitude + ', ' + position.coords.longitude + '</p>');
     channel.push('location', {
       coords: {
         lat: position.coords.latitude,
@@ -82,6 +78,35 @@ function trackLocation() {
   }, {
     enableHighAccuracy: true
   });
+}
+
+channel.on('player:update', (payload) => {
+  renderPlayer(payload);
+});
+
+let map = null;
+let marker = null;
+
+window.initMap = () => {
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: { lat: 50.9372123, lng: -1.3977227 },
+    styles: [{"featureType":"all","elementType":"labels.text.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"all","elementType":"labels.text.stroke","stylers":[{"color":"#000000"},{"lightness":13}]},{"featureType":"administrative","elementType":"geometry.fill","stylers":[{"color":"#000000"}]},{"featureType":"administrative","elementType":"geometry.stroke","stylers":[{"color":"#144b53"},{"lightness":14},{"weight":1.4}]},{"featureType":"landscape","elementType":"all","stylers":[{"color":"#08304b"}]},{"featureType":"poi","elementType":"geometry","stylers":[{"color":"#0c4152"},{"lightness":5}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#000000"}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#0b434f"},{"lightness":25}]},{"featureType":"road.arterial","elementType":"geometry.fill","stylers":[{"color":"#000000"}]},{"featureType":"road.arterial","elementType":"geometry.stroke","stylers":[{"color":"#0b3d51"},{"lightness":16}]},{"featureType":"road.local","elementType":"geometry","stylers":[{"color":"#000000"}]},{"featureType":"transit","elementType":"all","stylers":[{"color":"#146474"}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#021019"}]}],
+    zoom: 17
+  });
+
+  marker = new google.maps.Marker({
+    position: { lat: 50.9372214, lng: -1.3977103 },
+    map: map,
+    animation: google.maps.Animation.DROP,
+    title: 'Player 1'
+  });
+};
+
+function renderPlayer(player) {
+  if (marker) {
+    console.log('RENDER PLAYER', player.coords);
+    marker.setPosition(player.coords);
+  }
 }
 
 trackLocation();

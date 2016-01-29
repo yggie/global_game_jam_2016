@@ -9,6 +9,7 @@ defmodule GlobalGameJam_2016 do
     children = [
       # Start the endpoint when the application starts
       supervisor(GlobalGameJam_2016.Endpoint, []),
+      worker(GlobalGameJam_2016.Game.Worker, []),
       # Start the Ecto repository
       # supervisor(GlobalGameJam_2016.Repo, []),
       # Here you could define other workers and supervisors as children

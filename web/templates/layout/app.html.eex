@@ -9,6 +9,18 @@
 
     <title>Hello GlobalGameJam_2016!</title>
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
+
+    <style>
+      html, body, main {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        height: 100%;
+      }
+    </style>
   </head>
 
   <body>
@@ -17,5 +29,6 @@
     </main>
     <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCyWRUWR2a0yIjdPZMcabHEItp6z3nVrLY&callback=initMap"></script>
   </body>
 </html>
