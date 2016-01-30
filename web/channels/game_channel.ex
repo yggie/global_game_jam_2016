@@ -11,7 +11,7 @@ defmodule GlobalGameJam_2016.GameChannel do
     IO.puts "Message received"
     IO.inspect coords
     Worker.set_position(uid, {coords["lat"], coords["lng"]})
-    broadcast! socket, "player:update", %{ uid => uid, "coords" => coords }
+    broadcast! socket, "player:update", %{ "uid" => uid, "coords" => coords }
     {:noreply, socket}
   end
 end
