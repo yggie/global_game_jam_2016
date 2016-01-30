@@ -3,6 +3,9 @@ defmodule GlobalGameJam_2016.Game.Worker do
 
   alias GlobalGameJam_2016.Game
 
+  @max_offset 0.003
+  @min_offset 0.002
+
   def start_link() do
     uuid = UUID.uuid1()
     GenServer.start_link(__MODULE__, uuid, name: __MODULE__)
@@ -10,7 +13,25 @@ defmodule GlobalGameJam_2016.Game.Worker do
 
   def init(_uuid) do
     send self, :ping
-    {:ok, %Game{ uid: "public" }}
+
+    red_target_id = UUID.uuid1()
+    blue_target_id = UUID.uuid1()
+    game = %Game{
+      uid: "public",
+      red_targets: %{
+        red_target_id => %Game.Target{
+          id: red_target_id,
+          coords: %{ "lat" => 50.93724, "lng" => -1.397723 - @min_offset }
+        }
+      },
+      blue_targets: %{
+        blue_target_id => %Game.Target{
+          id: blue_target_id,
+          coords: %{ "lat" => 50.93726, "lng" => -1.397723 + @min_offset }
+        }
+      }
+    }
+    {:ok, game}
   end
 
   def update_location(id, location) do
@@ -94,7 +115,21 @@ defmodule GlobalGameJam_2016.Game.Worker do
     push_shared_state(state, push_function, state.red_players)
   end
 
-  defp push_shared_state(_state, push_function, players) do
+  defp push_shared_state(state, push_function, players) do
+    for {_id, target} <- state.red_targets do
+      push_function.("target:update:red", %{
+        "id" => target.id,
+        "coords" => target.coords
+      })
+    end
+
+    for {_id, target} <- state.blue_targets do
+      push_function.("target:update:blue", %{
+        "id" => target.id,
+        "coords" => target.coords
+      })
+    end
+
     for {_id, player} <- players do
       push_function.("player:update", %{
         "id" => player.id,

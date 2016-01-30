@@ -43,6 +43,14 @@ masterApp.initialize = function () {
       renderPlayer(payload);
     });
 
+    channel.on('target:update:red', (payload) => {
+      renderTarget(payload, 'red');
+    });
+
+    channel.on('target:update:blue', (payload) => {
+      renderTarget(payload, 'blue');
+    });
+
     function renderPlayer(playerData) {
       if (!map) {
         return;
@@ -83,6 +91,26 @@ masterApp.initialize = function () {
 
       marker.center.setCenter(playerData.coords);
       marker.radius.setCenter(playerData.coords);
+    }
+
+    let targets = {};
+    window.targets = targets;
+    function renderTarget(targetData, color) {
+      if (!map) {
+        return;
+      }
+
+      let target = targets[targetData.id];
+      if (!target) {
+        target = new google.maps.Marker({
+          map: map,
+          icon: (color === 'blue' ? 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png' : 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'),
+          animation: google.maps.Animation.DROP
+        });
+        targets[targetData.id] = target;
+      }
+
+      target.setPosition(new google.maps.LatLng(targetData.coords.lat, targetData.coords.lng));
     }
   });
 };

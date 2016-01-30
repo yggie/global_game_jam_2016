@@ -1,8 +1,16 @@
 defmodule GlobalGameJam_2016.Game do
-  defstruct uid: nil, red_players: %{}, blue_players: %{}
+  defstruct uid: nil,
+    red_players: %{},
+    blue_players: %{},
+    red_targets: %{},
+    blue_targets: %{}
 
   defmodule Player do
     defstruct id: nil, coords: nil, accuracy: nil
+  end
+
+  defmodule Target do
+    defstruct id: nil, coords: nil
   end
 
   alias GlobalGameJam_2016.Game
