@@ -7,20 +7,8 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Hello GlobalGameJam_2016!</title>
+    <title>Southampton GlobalGameJam 2016</title>
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
-
-    <style>
-      html, body, main {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-
-      #map {
-        height: 100%;
-      }
-    </style>
   </head>
 
   <body>
