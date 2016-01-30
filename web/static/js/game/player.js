@@ -1,14 +1,23 @@
 import Cookies from 'js-cookie';
-import q from 'q';
+import qwest from 'qwest';
+
+window.Cookies = Cookies;
 
 let player = {};
 
 player.connect = function () {
-  let deferred = q.defer();
+  return qwest.get('/api/sessions/validate')
+    .then((xhr, response) => {
+      if (response.status !== 200) {
+      return qwest.get('/api/sessions/join-game?id=1');
+      } else {
+        return response;
+      }
+    });
+};
 
-  deferred.resolve('connection success');
-
-  return deferred.promise;
+player.id = function () {
+  return Cookies.get('player_id');
 };
 
 export default player;

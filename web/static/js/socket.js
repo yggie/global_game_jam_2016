@@ -6,6 +6,7 @@
 import {Socket} from "phoenix"
 import {randomColor} from 'randomcolor';
 import googleMapsStyle from './google-maps-style';
+import player from './game/player';
 
 let socket = new Socket("/socket", {params: {token: window.userToken}})
 
@@ -72,14 +73,16 @@ let markers = {};
 
 function trackLocation() {
   window.navigator.geolocation.getCurrentPosition((position) => {
-    channel.push('location', {
-      uid: 'player-' + tempId,
-      accuracy: position.coords.accuracy,
-      coords: {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      }
-    });
+    if (player.id()) {
+      channel.push('location', {
+        id: player.id(),
+        accuracy: position.coords.accuracy,
+        coords: {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        }
+      });
+    }
 
     map.setCenter({
       lat: position.coords.latitude,
@@ -107,12 +110,12 @@ window.initMap = () => {
   });
 };
 
-function renderPlayer(player) {
+function renderPlayer(playerData) {
   if (!map) {
     return;
   }
 
-  let marker = markers[player.uid];
+  let marker = markers[playerData.id];
   if (!marker) {
     let color = randomColor({
       luminosity: 'light',
@@ -135,18 +138,18 @@ function renderPlayer(player) {
       fillColor: color,
       fillOpacity: 0.5,
       map: map,
-      radius: player.accuracy,
+      radius: playerData.accuracy,
       animation: google.maps.Animation.DROP
     });
     marker = {
       center: center,
       radius: radius
     };
-    markers[player.uid] = marker;
+    markers[playerData.id] = marker;
   }
 
-  marker.center.setCenter(player.coords);
-  marker.radius.setCenter(player.coords);
+  marker.center.setCenter(playerData.coords);
+  marker.radius.setCenter(playerData.coords);
 }
 
 trackLocation();

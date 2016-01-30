@@ -3,8 +3,8 @@ defmodule GlobalGameJam_2016.GameChannel do
 
   alias GlobalGameJam_2016.Game.Worker
 
-  def channel_name(game_uid) do
-    "game:" <> game_uid
+  def channel_name(game_id) do
+    "game:" <> game_id
   end
 
   def join("game:" <> _game_id, _message, socket) do
@@ -12,8 +12,8 @@ defmodule GlobalGameJam_2016.GameChannel do
     {:ok, socket}
   end
 
-  def handle_in("location", location = %{ "uid" => uid }, socket) do
-    Worker.update_location(uid, location)
+  def handle_in("location", location = %{ "id" => id }, socket) do
+    Worker.update_location(id, location)
     {:noreply, socket}
   end
 

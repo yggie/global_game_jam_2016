@@ -20,7 +20,10 @@ defmodule GlobalGameJam_2016.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", GlobalGameJam_2016 do
-  #   pipe_through :api
-  # end
+  scope "/api", GlobalGameJam_2016 do
+    pipe_through :api
+
+    get "/sessions/validate", SessionsController, :validate
+    get "/sessions/join-game", SessionsController, :join_game
+  end
 end
