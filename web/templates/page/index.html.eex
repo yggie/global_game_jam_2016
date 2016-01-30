@@ -1,5 +1,5 @@
 <div id="map"></div>
 <div id="chat">
-  <div id="messages"/>
-  <input id="message-input" placeholder="Send..."/>
+  <div id="messages"></div>
+  <input id="message-input" placeholder="Send..." />
 </div>

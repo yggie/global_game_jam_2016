@@ -16,8 +16,12 @@ export class Chat {
   }
 
   appendMessage(msg, msgContainer, channel) {
-    console.log("hello")
-    msgContainer.append(`<br/>${msg.body}`)
-    msgContainer.scrollTop(msgContainer.prop("scrollHeight"))
+    msgContainer.append(`<p>${msg.body}</p>`)
+
+    let lineHeight = msgContainer.children().first().height() + 10;
+    let numberOfLines = msgContainer.children().length;
+    let height = lineHeight * numberOfLines;
+
+    msgContainer.animate({scrollTop: height});
   }
 }

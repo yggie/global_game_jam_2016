@@ -17,5 +17,10 @@ html, body, main {
 
 #message-input {
   width: 100%;
-  line-height: 40px;
+}
+
+#messages {
+  height: 100px;
+  background: #efefef;
+  overflow: auto;
 }
