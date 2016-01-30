@@ -12,13 +12,13 @@ defmodule GlobalGameJam_2016.Game.Worker do
     {:ok, %Game{ uid: "public" }}
   end
 
-  def set_position({lat, lng}) do
-    GenServer.cast(__MODULE__, {:set_position, {lat, lng}})
+  def set_position(uid, {lat, lng}) do
+    GenServer.cast(__MODULE__, {:set_position, uid, {lat, lng}})
   end
 
-  def handle_cast({:set_position, {lat, lng}}, state) do
+  def handle_cast({:set_position, uid, {lat, lng}}, state) do
     IO.puts "updated game state"
-    {:noreply, %Game{state | coords: {lat, lng}}}
+    {:noreply, %Game{state | players: Map.put(state.players, uid, {lat, lng})}}
   end
 
   # def handle_call({:new_player, _team}, _from, state) do

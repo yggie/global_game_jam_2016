@@ -60,12 +60,15 @@ channel.join()
   .receive('error', resp => { console.log("Unable to join", resp) })
 
 function queueTrackLocation() {
-  setTimeout(trackLocation, 2000);
+  setTimeout(trackLocation, 5000);
 }
+
+var tempId = Math.round(Math.random() * 1e6);
 
 function trackLocation() {
   window.navigator.geolocation.getCurrentPosition((position) => {
     channel.push('location', {
+      uid: 'player-' + tempId,
       coords: {
         lat: position.coords.latitude,
         lng: position.coords.longitude
@@ -85,28 +88,56 @@ channel.on('player:update', (payload) => {
 });
 
 let map = null;
-let marker = null;
+let markers = {};
 
 window.initMap = () => {
   map = new google.maps.Map(document.getElementById('map'), {
     center: { lat: 50.9372123, lng: -1.3977227 },
     styles: [{"featureType":"all","elementType":"labels.text.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"all","elementType":"labels.text.stroke","stylers":[{"color":"#000000"},{"lightness":13}]},{"featureType":"administrative","elementType":"geometry.fill","stylers":[{"color":"#000000"}]},{"featureType":"administrative","elementType":"geometry.stroke","stylers":[{"color":"#144b53"},{"lightness":14},{"weight":1.4}]},{"featureType":"landscape","elementType":"all","stylers":[{"color":"#08304b"}]},{"featureType":"poi","elementType":"geometry","stylers":[{"color":"#0c4152"},{"lightness":5}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#000000"}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#0b434f"},{"lightness":25}]},{"featureType":"road.arterial","elementType":"geometry.fill","stylers":[{"color":"#000000"}]},{"featureType":"road.arterial","elementType":"geometry.stroke","stylers":[{"color":"#0b3d51"},{"lightness":16}]},{"featureType":"road.local","elementType":"geometry","stylers":[{"color":"#000000"}]},{"featureType":"transit","elementType":"all","stylers":[{"color":"#146474"}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#021019"}]}],
-    zoom: 17
+    zoom: 18
   });
 
   marker = new google.maps.Marker({
-    position: { lat: 50.9372214, lng: -1.3977103 },
+    position: { lat: 50.9372214, lng: 1.3977103 },
     map: map,
     animation: google.maps.Animation.DROP,
     title: 'Player 1'
   });
 };
 
+var colors = [
+  "blue",
+  "red",
+  "yellow",
+  "green",
+  "grey",
+  "white",
+  "orange",
+  "purple"
+];
+
 function renderPlayer(player) {
-  if (marker) {
-    console.log('RENDER PLAYER', player.coords);
-    marker.setPosition(player.coords);
+  if (!map) {
+    return;
   }
+
+  var marker = markers[player.uid];
+  if (!marker) {
+    marker = new google.maps.Marker({
+      id: player.uid,
+      map: map,
+      title: 'Player ' + player.uid,
+      icon: {
+        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+        strokeColor: colors[Math.floor(Math.random() * colors.length)],
+        scale: 3
+      },
+      animation: google.maps.Animation.DROP
+    });
+    markers[player.uid] = marker;
+  }
+
+  marker.setPosition(player.coords);
 }
 
 trackLocation();
