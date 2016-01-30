@@ -138,10 +138,11 @@ function renderPlayer(player) {
       radius: player.accuracy,
       animation: google.maps.Animation.DROP
     });
-    markers[player.uid] = {
+    marker = {
       center: center,
       radius: radius
     };
+    markers[player.uid] = marker;
   }
 
   marker.center.setCenter(player.coords);
