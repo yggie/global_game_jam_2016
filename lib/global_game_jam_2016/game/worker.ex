@@ -25,31 +25,46 @@ defmodule GlobalGameJam_2016.Game.Worker do
     GenServer.call(__MODULE__, {:has_player?, player_id})
   end
 
-  def push_state(push_function) do
-    GenServer.cast(__MODULE__, {:push_state, push_function})
+  def push_state(team_name, push_function) do
+    GenServer.cast(__MODULE__, {:push_state, team_name, push_function})
+  end
+
+  def team_name_for_player(player_id) do
+    GenServer.call(__MODULE__, {:team_name, player_id})
+  end
+
+  def handle_call({:team_name, player_id}, _from, state) do
+    {:reply, Game.team_name_for_player(state, player_id), state}
   end
 
   def handle_call({:has_player?, player_id}, _from, state) do
-    {:reply, Map.has_key?(state.players, player_id), state}
+    {:reply, Game.has_player?(state, player_id), state}
   end
 
   def handle_call(:new_player, _from, state) do
-    new_player_id = UUID.uuid1()
-    player = %Game.Player{ id: new_player_id }
-
-    {:reply, new_player_id, %Game{state | players: Map.put(state.players, new_player_id, player)}}
+    if Enum.count(Map.keys(state.blue_players)) < Enum.count(Map.keys(state.red_players)) do
+      {player_id, state} = Game.new_blue_player(state)
+      {:reply, {player_id, "red"}, state}
+    else
+      {player_id, state} = Game.new_red_player(state)
+      {:reply, {player_id, "blue"}, state}
+    end
   end
 
-  def handle_cast({:push_state, push_function}, state) do
-    push_state(state, push_function)
-
+  def handle_cast({:push_state, "blue", push_function}, state) do
+    push_blue_state(state, push_function)
     {:noreply, state}
   end
 
-  def handle_cast({:update_location, id, %{"id" => _, "coords" => _} = location}, state) do
-    if Map.has_key?(state.players, id) do
+  def handle_cast({:push_state, "red", push_function}, state) do
+    push_red_state(state, push_function)
+    {:noreply, state}
+  end
+
+  def handle_cast({:update_location, id, location}, state) do
+    if Game.has_player?(state, id) do
       IO.puts "updated player ID: #{id}"
-      {:noreply, %Game{state | players: Map.put(state.players, id, location)}}
+      {:noreply, Game.update_player(state, id, location)}
     else
       IO.puts "Could not find player with ID: #{id}"
       {:noreply, state}
@@ -57,20 +72,33 @@ defmodule GlobalGameJam_2016.Game.Worker do
   end
 
   def handle_info({:ping}, state) do
-    push_state(state, fn (message, payload) ->
-      channel_name = GlobalGameJam_2016.GameChannel.channel_name(state.uid)
+    push_blue_state(state, fn (message, payload) ->
+      blue_channel = GlobalGameJam_2016.GameChannel.channel_name(state.uid, "blue")
+      GlobalGameJam_2016.Endpoint.broadcast!(blue_channel, message, payload)
 
-      GlobalGameJam_2016.Endpoint.broadcast!(channel_name, message, payload)
+      red_channel = GlobalGameJam_2016.GameChannel.channel_name(state.uid, "red")
+      GlobalGameJam_2016.Endpoint.broadcast!(red_channel, message, payload)
     end)
 
     Process.send_after self, {:ping}, 5000
     {:noreply, state}
   end
 
-  defp push_state(state, push_function) do
-    for {_id, player} <- state.players do
+  defp push_blue_state(state, push_function) do
+    push_shared_state(state, push_function)
+    for {_id, player} <- state.blue_players do
       push_function.("player:update", player)
     end
+  end
+
+  defp push_red_state(state, push_function) do
+    push_shared_state(state, push_function)
+    for {_id, player} <- state.red_players do
+      push_function.("player:update", player)
+    end
+  end
+
+  defp push_shared_state(_state, _push_function) do
   end
 
   # def handle_call({:new_player, _team}, _from, state) do

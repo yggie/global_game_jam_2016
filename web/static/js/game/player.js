@@ -35,4 +35,8 @@ player.id = function () {
   return Cookies.get('player_id');
 };
 
+player.team = function() {
+  return Cookies.get('team_name');
+};
+
 export default player;

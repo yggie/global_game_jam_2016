@@ -3,12 +3,17 @@ defmodule GlobalGameJam_2016.GameChannel do
 
   alias GlobalGameJam_2016.Game.Worker
 
-  def channel_name(game_id) do
-    "game:" <> game_id
+  def channel_name(game_id, "red") do
+    "game:red:" <> game_id
   end
 
-  def join("game:" <> _game_id, _message, socket) do
-    send self, :after_join
+  def channel_name(game_id, "blue") do
+    "game:blue:" <> game_id
+  end
+
+  def join("game:" <> game_meta, _message, socket) do
+    [team_name, _game_id] = String.split(game_meta, ":")
+    send self, {:after_join, team_name}
     {:ok, socket}
   end
 
@@ -17,8 +22,8 @@ defmodule GlobalGameJam_2016.GameChannel do
     {:noreply, socket}
   end
 
-  def handle_info(:after_join, socket) do
-    Worker.push_state(fn (message, payload) ->
+  def handle_info({:after_join, team_name}, socket) do
+    Worker.push_state(team_name, fn (message, payload) ->
       push socket, message, payload
     end)
 
