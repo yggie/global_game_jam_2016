@@ -1,9 +1,10 @@
 export class Chat {
-  constructor(socket, channel) {
+  constructor(channel, sound) {
     let msgContainer = $("#messages")
     let msgInput = $("#message-input")
 
     channel.on("new_message", msg => {
+      sound.new_message()
       this.appendMessage(msg, msgContainer, channel)
     })
 

@@ -23,6 +23,7 @@ import googleMapsStyle from './google-maps-style';
 import player from './game/player';
 import game from './game';
 import {Chat} from './chat'
+import {Sound} from './sound'
 
 game.initialize();
 
@@ -37,7 +38,8 @@ window.initMap = () => {
 };
 
 player.connect().then((channel) => {
-  new Chat(null, channel);
+  let sound = new Sound()
+  new Chat(channel, sound)
 
   let teamName = $("#team-name")
   let timeLeft = $("#time-left")
