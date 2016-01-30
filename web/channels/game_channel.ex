@@ -8,11 +8,20 @@ defmodule GlobalGameJam_2016.GameChannel do
   end
 
   def join("game:" <> _game_id, _message, socket) do
+    send self, :after_join
     {:ok, socket}
   end
 
   def handle_in("location", location = %{ "uid" => uid }, socket) do
     Worker.update_location(uid, location)
+    {:noreply, socket}
+  end
+
+  def handle_info(:after_join, socket) do
+    Worker.push_state(fn (message, payload) ->
+      push socket, message, payload
+    end)
+
     {:noreply, socket}
   end
 end
