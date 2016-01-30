@@ -3,6 +3,7 @@ import googleMapsStyle from './google-maps-style';
 import player from './game/player';
 import {Chat} from './chat'
 import {Sound} from './sound'
+import tracking from './player-app/tracking';
 
 let map = null;
 
@@ -31,9 +32,11 @@ masterApp.initialize = function () {
 
     let markers = {};
 
-    map.setCenter({
-      lat: position.coords.latitude,
-      lng: position.coords.longitude
+    tracking.once((position) => {
+      map.setCenter({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      });
     });
 
     channel.on('player:update', (payload) => {

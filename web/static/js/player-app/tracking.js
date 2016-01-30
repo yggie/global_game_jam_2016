@@ -8,23 +8,8 @@ function queueTrackLocation() {
 
 function trackLocation() {
   window.navigator.geolocation.getCurrentPosition((position) => {
-    callbacks.each((callback) => {
+    callbacks.forEach((callback) => {
       callback(position);
-    });
-    if (player.id()) {
-      channel.push('location', {
-        id: player.id(),
-        accuracy: position.coords.accuracy,
-        coords: {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        }
-      });
-    }
-
-    map.setCenter({
-      lat: position.coords.latitude,
-      lng: position.coords.longitude
     });
 
     queueTrackLocation();
@@ -42,6 +27,10 @@ tracking.start = function (callback) {
   }
 
   callbacks.push(callback);
+};
+
+tracking.once = function (callback) {
+  window.navigator.geolocation.getCurrentPosition(callback);
 };
 
 export default tracking;
