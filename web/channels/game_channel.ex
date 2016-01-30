@@ -24,4 +24,9 @@ defmodule GlobalGameJam_2016.GameChannel do
 
     {:noreply, socket}
   end
+
+  def handle_in("new_message", payload, socket) do
+    broadcast socket, "new_message", payload
+    {:noreply, socket}
+  end
 end
