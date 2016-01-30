@@ -39,6 +39,14 @@ window.initMap = () => {
 player.connect().then((channel) => {
   new Chat(null, channel);
 
+  let teamName = $("#team-name")
+  let timeLeft = $("#time-left")
+  let cellsCollected = $("#cells-collected")
+
+  teamName.append("Team: Blue")
+  timeLeft.append("Time: 10 mins")
+  cellsCollected.append("Energy Cells: 1 of 5 found")
+
   function queueTrackLocation() {
     setTimeout(trackLocation, 5000);
   }

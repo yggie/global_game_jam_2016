@@ -1,0 +1,10 @@
+<h1 id="team-name"></h1>
+<h2 id="time-left"></h2>
+<h2 id="cells-collected"></h2>
+
+<hr />
+
+<div id="chat">
+  <div id="messages"/>
+  <input id="message-input" placeholder="Send..."/>
+</div>
