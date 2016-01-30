@@ -3,15 +3,16 @@ defmodule GlobalGameJam_2016.GameChannel do
 
   alias GlobalGameJam_2016.Game.Worker
 
+  def channel_name(game_uid) do
+    "game:" <> game_uid
+  end
+
   def join("game:" <> _game_id, _message, socket) do
     {:ok, socket}
   end
 
-  def handle_in("location", %{"uid" => uid, "coords" => coords , "accuracy" => accuracy}, socket) do
-    IO.puts "Message received"
-    IO.inspect coords
-    Worker.set_position(uid, {coords["lat"], coords["lng"]})
-    broadcast! socket, "player:update", %{"uid" => uid, "coords" => coords, "accuracy" => accuracy}
+  def handle_in("location", location = %{ "uid" => uid }, socket) do
+    Worker.update_location(uid, location)
     {:noreply, socket}
   end
 end
