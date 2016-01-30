@@ -16,6 +16,7 @@
       <%= render @view_module, @view_template, assigns %>
     </main>
     <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script src="<%= static_path(@conn, "/js/jquery.mb.audio.js") %>"></script>
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCyWRUWR2a0yIjdPZMcabHEItp6z3nVrLY&callback=initMap"></script>
   </body>
