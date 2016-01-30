@@ -4,9 +4,6 @@
 // To use Phoenix channels, the first step is to import Socket
 // and connect at the socket path in "lib/my_app/endpoint.ex":
 import {Socket} from "phoenix"
-import {randomColor} from 'randomcolor';
-import googleMapsStyle from './google-maps-style';
-import player from './game/player';
 
 let socket = new Socket("/socket", {params: {token: window.userToken}})
 
@@ -56,102 +53,4 @@ let socket = new Socket("/socket", {params: {token: window.userToken}})
 
 socket.connect()
 
-// Now that you are connected, you can join channels with a topic:
-export let channel = socket.channel('game:public', {})
-channel.join()
-  .receive('ok', resp => { console.log("Joined successfully", resp) })
-  .receive('error', resp => { console.log("Unable to join", resp) })
-
-function queueTrackLocation() {
-  setTimeout(trackLocation, 5000);
-}
-
-var tempId = Math.round(Math.random() * 1e6);
-
-let map = null;
-let markers = {};
-
-function trackLocation() {
-  window.navigator.geolocation.getCurrentPosition((position) => {
-    if (player.id()) {
-      channel.push('location', {
-        id: player.id(),
-        accuracy: position.coords.accuracy,
-        coords: {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        }
-      });
-    }
-
-    map.setCenter({
-      lat: position.coords.latitude,
-      lng: position.coords.longitude
-    });
-
-    queueTrackLocation();
-  }, (error) => {
-    console.log('error', error);
-    queueTrackLocation();
-  }, {
-    enableHighAccuracy: true
-  });
-}
-
-channel.on('player:update', (payload) => {
-  renderPlayer(payload);
-});
-
-window.initMap = () => {
-  map = new google.maps.Map(document.getElementById('map'), {
-    center: { lat: 50.9372123, lng: -1.3977227 },
-    styles: googleMapsStyle,
-    zoom: 17
-  });
-};
-
-function renderPlayer(playerData) {
-  if (!map) {
-    return;
-  }
-
-  let marker = markers[playerData.id];
-  if (!marker) {
-    let color = randomColor({
-      luminosity: 'light',
-      hue: 'random'
-    });
-    let center = new google.maps.Circle({
-      strokeColor: color,
-      strokeOpacity: 0.9,
-      strokeWidth: 1.0,
-      fillColor: color,
-      fillOpacity: 0.9,
-      map: map,
-      radius: 2.0,
-      animation: google.maps.Animation.DROP
-    });
-    let radius = new google.maps.Circle({
-      strokeColor: color,
-      strokeOpacity: 0.8,
-      strokeWidth: 1.0,
-      fillColor: color,
-      fillOpacity: 0.5,
-      map: map,
-      radius: playerData.accuracy,
-      animation: google.maps.Animation.DROP
-    });
-    marker = {
-      center: center,
-      radius: radius
-    };
-    markers[playerData.id] = marker;
-  }
-
-  marker.center.setCenter(playerData.coords);
-  marker.radius.setCenter(playerData.coords);
-}
-
-trackLocation();
-
-export default socket
+export default socket;
