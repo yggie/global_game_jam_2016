@@ -17,7 +17,7 @@ defmodule GlobalGameJam_2016.GameChannel do
     {:ok, socket}
   end
 
-  def handle_in("location", location = %{ "id" => id }, socket) do
+  def handle_in("location", location = %{"id" => id}, socket) do
     Worker.update_location(id, location)
     {:noreply, socket}
   end

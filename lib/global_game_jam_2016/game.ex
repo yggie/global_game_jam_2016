@@ -33,10 +33,8 @@ defmodule GlobalGameJam_2016.Game do
       "red" ->
         player = Map.get(game.red_players, id)
         player = %Player{player | coords: coords, accuracy: accuracy}
-        %Game{game | blue_players: Map.put(game.red_players, id, player)}
+        %Game{game | red_players: Map.put(game.red_players, id, player)}
     end
-
-    game
   end
 
   def team_name_for_player(game, player_id) do

@@ -9,7 +9,7 @@ defmodule GlobalGameJam_2016.Game.Worker do
   end
 
   def init(_uuid) do
-    send self, {:ping}
+    send self, :ping
     {:ok, %Game{ uid: "public" }}
   end
 
@@ -44,10 +44,10 @@ defmodule GlobalGameJam_2016.Game.Worker do
   def handle_call(:new_player, _from, state) do
     if Enum.count(Map.keys(state.blue_players)) < Enum.count(Map.keys(state.red_players)) do
       {player_id, state} = Game.new_blue_player(state)
-      {:reply, {player_id, "red"}, state}
+      {:reply, {player_id, "blue"}, state}
     else
       {player_id, state} = Game.new_red_player(state)
-      {:reply, {player_id, "blue"}, state}
+      {:reply, {player_id, "red"}, state}
     end
   end
 
@@ -71,34 +71,37 @@ defmodule GlobalGameJam_2016.Game.Worker do
     end
   end
 
-  def handle_info({:ping}, state) do
+  def handle_info(:ping, state) do
     push_blue_state(state, fn (message, payload) ->
       blue_channel = GlobalGameJam_2016.GameChannel.channel_name(state.uid, "blue")
       GlobalGameJam_2016.Endpoint.broadcast!(blue_channel, message, payload)
+    end)
 
+    push_red_state(state, fn (message, payload) ->
       red_channel = GlobalGameJam_2016.GameChannel.channel_name(state.uid, "red")
       GlobalGameJam_2016.Endpoint.broadcast!(red_channel, message, payload)
     end)
 
-    Process.send_after self, {:ping}, 5000
+    Process.send_after self, :ping, 5000
     {:noreply, state}
   end
 
   defp push_blue_state(state, push_function) do
-    push_shared_state(state, push_function)
-    for {_id, player} <- state.blue_players do
-      push_function.("player:update", player)
-    end
+    push_shared_state(state, push_function, state.blue_players)
   end
 
   defp push_red_state(state, push_function) do
-    push_shared_state(state, push_function)
-    for {_id, player} <- state.red_players do
-      push_function.("player:update", player)
-    end
+    push_shared_state(state, push_function, state.red_players)
   end
 
-  defp push_shared_state(_state, _push_function) do
+  defp push_shared_state(_state, push_function, players) do
+    for {_id, player} <- players do
+      push_function.("player:update", %{
+        "id" => player.id,
+        "coords" => player.coords,
+        "accuracy" => player.accuracy
+      })
+    end
   end
 
   # def handle_call({:new_player, _team}, _from, state) do
