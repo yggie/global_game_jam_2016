@@ -4,11 +4,14 @@ import qwest from 'qwest';
 import socket from '../socket';
 
 let player = {};
-let playerConnectPromise = null;
+let playerConnectApiPromise = null;
+let playerConnectDeferred = q.defer();
 
 player.connect = function () {
-  if (!playerConnectPromise) {
-    playerConnectPromise = qwest.get('/api/sessions/validate')
+  if (playerConnectApiPromise) {
+    console.error('Multiple attempts to connect the player, the last one is ignored');
+  } else {
+    playerConnectApiPromise = qwest.get('/api/sessions/validate')
       .then((xhr, response) => {
         if (response.status !== 200) {
           return qwest.get('/api/sessions/join-game?id=1')
@@ -25,10 +28,11 @@ player.connect = function () {
           .receive('error', resp => { console.log("Unable to join", resp) })
 
         return channel;
-      });
+      })
+      .then(playerConnectDeferred.resolve);
   }
 
-  return playerConnectPromise;
+  return playerConnectDeferred.promise;
 };
 
 player.id = function () {
