@@ -45,7 +45,7 @@ player.connect().then((channel) => {
   let timeLeft = $("#time-left")
   let cellsCollected = $("#cells-collected")
 
-  teamName.append("Team: Blue")
+  teamName.append("Team: " + player.team())
   timeLeft.append("Time: 10 mins")
   cellsCollected.append("Energy Cells: 1 of 5 found")
 
