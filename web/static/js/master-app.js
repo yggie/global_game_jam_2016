@@ -53,6 +53,8 @@ masterApp.initialize = function () {
 
     channel.on('target:captured', (payload) => {
       console.log('TARGET CAPTURED:', payload);
+      let target = targets[payload.id];
+      target.setMap(null);
       delete targets[payload.id];
     });
 
