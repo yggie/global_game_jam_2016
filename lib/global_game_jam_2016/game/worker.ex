@@ -17,22 +17,12 @@ defmodule GlobalGameJam_2016.Game.Worker do
     red_target_id = UUID.uuid1()
     blue_target_id = UUID.uuid1()
     game = %Game{ uid: "public" }
-    game = %Game{game | blue_team: %Game.Team{game.blue_team | targets: %{
-          blue_target_id => %{
-            id: blue_target_id,
-            coords: %{ "lat" => 50.93726 - 0.07*@min_offset, "lng" => -1.397723 + 0.1*@min_offset }
-          }
-        }
-      }
-    }
-    game = %Game{game | red_team: %Game.Team{game.red_team | targets: %{
-          red_target_id => %{
-            id: red_target_id,
-            coords: %{ "lat" => 50.93724 + 0.2*@min_offset, "lng" => -1.397723 }
-          }
-        }
-      }
-    }
+
+    blue_target = %{ "lat" => 50.93726 - 0.07*@min_offset, "lng" => -1.397723 + 0.1*@min_offset }
+    GenServer.cast(self, {:create_target, "blue", blue_target})
+
+    red_target = %{ "lat" => 50.93724 + 0.2*@min_offset, "lng" => -1.397723 }
+    GenServer.cast(self, {:create_target, "red", red_target})
 
     {:ok, game}
   end
@@ -57,6 +47,10 @@ defmodule GlobalGameJam_2016.Game.Worker do
     GenServer.call(__MODULE__, {:team_name, player_id})
   end
 
+  def debug_create_target(team_name, coords) do
+    GenServer.cast(__MODULE__, {:create_target, team_name, coords})
+  end
+
   def handle_call({:team_name, player_id}, _from, state) do
     {:reply, Game.team_name_for_player(state, player_id), state}
   end
@@ -77,6 +71,33 @@ defmodule GlobalGameJam_2016.Game.Worker do
 
   def handle_cast({:push_state, "blue", push_function}, state) do
     push_blue_state(state, push_function)
+    {:noreply, state}
+  end
+
+  def handle_cast({:create_target, "blue", coords}, state) do
+    {blue_team, target} = Game.Team.create_target(state.blue_team, coords)
+    state = %Game{state | blue_team: blue_team}
+
+    blue_channel = channel_name(state, "blue")
+    red_channel = channel_name(state, "red")
+    push_target_update("blue", target, fn (message, payload) ->
+      GlobalGameJam_2016.Endpoint.broadcast!(blue_channel, message, payload)
+      GlobalGameJam_2016.Endpoint.broadcast!(red_channel, message, payload)
+    end)
+
+    {:noreply, state}
+  end
+
+  def handle_cast({:create_target, "red", coords}, state) do
+    {red_team, target} = Game.Team.create_target(state.red_team, coords)
+    state = %Game{state | red_team: red_team}
+
+    blue_channel = channel_name(state, "blue")
+    red_channel = channel_name(state, "red")
+    push_target_update("red", target, fn (message, payload) ->
+      GlobalGameJam_2016.Endpoint.broadcast!(blue_channel, message, payload)
+      GlobalGameJam_2016.Endpoint.broadcast!(red_channel, message, payload)
+    end)
     {:noreply, state}
   end
 
@@ -147,17 +168,11 @@ defmodule GlobalGameJam_2016.Game.Worker do
     })
 
     for {_id, target} <- state.red_team.targets do
-      push_function.("target:update:red", %{
-        "id" => target.id,
-        "coords" => target.coords
-      })
+      push_target_update("red", target, push_function)
     end
 
     for {_id, target} <- state.blue_team.targets do
-      push_function.("target:update:blue", %{
-        "id" => target.id,
-        "coords" => target.coords
-      })
+      push_target_update("blue", target, push_function)
     end
 
     for {_id, player} <- players do
@@ -167,6 +182,13 @@ defmodule GlobalGameJam_2016.Game.Worker do
         "accuracy" => player.accuracy
       })
     end
+  end
+
+  defp push_target_update(team, target, push_function) do
+    push_function.("target:update:" <> team, %{
+      "id" => target.id,
+      "coords" => target.coords
+    })
   end
 
   # def handle_call({:new_player, _team}, _from, state) do

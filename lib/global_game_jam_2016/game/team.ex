@@ -40,6 +40,12 @@ defmodule GlobalGameJam_2016.Game.Team do
     {%Team{team | players: Map.put(team.players, id, player), points: Enum.count(captured_targets) + team.points}, captured_targets}
   end
 
+  def create_target(team, coords) do
+    id = UUID.uuid1()
+    target = %Target{id: id, coords: coords}
+    {%Team{team | targets: Map.put(team.targets, id, target)}, target}
+  end
+
   defp distance(coords_0, coords_1) do
     lat_diff = coords_0["lat"] - coords_1["lat"]
     lng_diff = coords_0["lng"] - coords_1["lng"]

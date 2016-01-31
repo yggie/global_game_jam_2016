@@ -22,6 +22,11 @@ defmodule GlobalGameJam_2016.GameChannel do
     {:noreply, socket}
   end
 
+  def handle_in("debug_create_target", %{"team" => team, "coords" => coords}, socket) do
+    Worker.debug_create_target(team, coords)
+    {:noreply, socket}
+  end
+
   def handle_info({:after_join, team_name}, socket) do
     Worker.push_state(team_name, fn (message, payload) ->
       push socket, message, payload

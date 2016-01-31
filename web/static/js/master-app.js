@@ -123,6 +123,17 @@ masterApp.initialize = function () {
 
       target.setPosition(new google.maps.LatLng(targetData.coords.lat, targetData.coords.lng));
     }
+
+    // TODO REMOVE DEBUG CODE
+    google.maps.event.addListener(map, 'click', (event) => {
+      channel.push('debug_create_target', {
+        team: player.team(),
+        coords: {
+          lat: event.latLng.lat(),
+          lng: event.latLng.lng()
+        }
+      });
+    });
   });
 };
 
