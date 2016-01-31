@@ -10,7 +10,8 @@ export class Chat {
 
     msgInput.on("keypress", e => {
       if(e.which !== 13) { return }
-      channel.push("new_message", {body: msgInput.val()})
+      let message = `${new Date().toLocaleString()} <span class="message">${msgInput.val()}<span>`
+      channel.push("new_message", {body: message})
       msgInput.val("")
     })
   }

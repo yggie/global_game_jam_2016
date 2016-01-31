@@ -12,7 +12,23 @@ html, body, main {
 }
 
 #map {
-  height: 80%;
+  float: left;
+  height: 100%;
+  width: 50%;
+}
+
+#sidebar {
+  float: left;
+  height: 100%;
+  width: 50%;
+  background-color: green;
+}
+
+#open-or-join {
+  width: 100%;
+}
+
+#chat {
 }
 
 #message-input {
@@ -20,7 +36,16 @@ html, body, main {
 }
 
 #messages {
-  height: 100px;
+  height: 800px;
   background: #efefef;
   overflow: auto;
+}
+
+#messages > p {
+  line-height: 12pt;
+  padding: 0;
+}
+
+.message {
+  color: red;
 }
