@@ -51,6 +51,15 @@ masterApp.initialize = function () {
       renderTarget(payload, 'blue');
     });
 
+    channel.on('target:captured', (payload) => {
+      console.log('TARGET CAPTURED:', payload);
+      delete targets[payload.id];
+    });
+
+    channel.on('team:update', (payload) => {
+      console.log('TEAM POINTS: (', payload.name, ':', payload.points, ')');
+    });
+
     function renderPlayer(playerData) {
       if (!map) {
         return;
@@ -94,7 +103,6 @@ masterApp.initialize = function () {
     }
 
     let targets = {};
-    window.targets = targets;
     function renderTarget(targetData, color) {
       if (!map) {
         return;

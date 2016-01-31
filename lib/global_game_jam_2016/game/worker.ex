@@ -1,7 +1,7 @@
 defmodule GlobalGameJam_2016.Game.Worker do
-  use GenServer
-
   alias GlobalGameJam_2016.Game
+
+  use GenServer
 
   @max_offset 0.003
   @min_offset 0.002
@@ -16,21 +16,24 @@ defmodule GlobalGameJam_2016.Game.Worker do
 
     red_target_id = UUID.uuid1()
     blue_target_id = UUID.uuid1()
-    game = %Game{
-      uid: "public",
-      red_targets: %{
-        red_target_id => %Game.Target{
-          id: red_target_id,
-          coords: %{ "lat" => 50.93724, "lng" => -1.397723 - @min_offset }
-        }
-      },
-      blue_targets: %{
-        blue_target_id => %Game.Target{
-          id: blue_target_id,
-          coords: %{ "lat" => 50.93726, "lng" => -1.397723 + @min_offset }
+    game = %Game{ uid: "public" }
+    game = %Game{game | blue_team: %Game.Team{game.blue_team | targets: %{
+          blue_target_id => %{
+            id: blue_target_id,
+            coords: %{ "lat" => 50.93726, "lng" => -1.397723 + @min_offset }
+          }
         }
       }
     }
+    game = %Game{game | red_team: %Game.Team{game.red_team | targets: %{
+          red_target_id => %{
+            id: red_target_id,
+            coords: %{ "lat" => 50.93724, "lng" => -1.397723 }
+          }
+        }
+      }
+    }
+
     {:ok, game}
   end
 
@@ -63,7 +66,7 @@ defmodule GlobalGameJam_2016.Game.Worker do
   end
 
   def handle_call(:new_player, _from, state) do
-    if Enum.count(Map.keys(state.blue_players)) < Enum.count(Map.keys(state.red_players)) do
+    if Game.Team.size(state.blue_team) < Game.Team.size(state.red_team) do
       {player_id, state} = Game.new_blue_player(state)
       {:reply, {player_id, "blue"}, state}
     else
@@ -85,7 +88,20 @@ defmodule GlobalGameJam_2016.Game.Worker do
   def handle_cast({:update_location, id, location}, state) do
     if Game.has_player?(state, id) do
       IO.puts "updated player ID: #{id}"
-      {:noreply, Game.update_player(state, id, location)}
+      {state, {team_name, captured_targets}} = Game.update_player(state, id, location)
+
+      blue_channel = channel_name(state, "blue")
+      red_channel = channel_name(state, "red")
+      message = "target:captured"
+      for claimed_target <- captured_targets do
+        payload = %{
+          "id" => claimed_target.id
+        }
+        GlobalGameJam_2016.Endpoint.broadcast!(blue_channel, message, payload)
+        GlobalGameJam_2016.Endpoint.broadcast!(red_channel, message, payload)
+      end
+
+      {:noreply, state}
     else
       IO.puts "Could not find player with ID: #{id}"
       {:noreply, state}
@@ -93,13 +109,13 @@ defmodule GlobalGameJam_2016.Game.Worker do
   end
 
   def handle_info(:ping, state) do
+    blue_channel = channel_name(state, "blue")
     push_blue_state(state, fn (message, payload) ->
-      blue_channel = GlobalGameJam_2016.GameChannel.channel_name(state.uid, "blue")
       GlobalGameJam_2016.Endpoint.broadcast!(blue_channel, message, payload)
     end)
 
+    red_channel = channel_name(state, "red")
     push_red_state(state, fn (message, payload) ->
-      red_channel = GlobalGameJam_2016.GameChannel.channel_name(state.uid, "red")
       GlobalGameJam_2016.Endpoint.broadcast!(red_channel, message, payload)
     end)
 
@@ -107,23 +123,37 @@ defmodule GlobalGameJam_2016.Game.Worker do
     {:noreply, state}
   end
 
+  def channel_name(state, team_name) do
+    GlobalGameJam_2016.GameChannel.channel_name(state.uid, team_name)
+  end
+
   defp push_blue_state(state, push_function) do
-    push_shared_state(state, push_function, state.blue_players)
+    push_shared_state(state, push_function, state.blue_team.players)
   end
 
   defp push_red_state(state, push_function) do
-    push_shared_state(state, push_function, state.red_players)
+    push_shared_state(state, push_function, state.red_team.players)
   end
 
   defp push_shared_state(state, push_function, players) do
-    for {_id, target} <- state.red_targets do
+    push_function.("team:update", %{
+      "name" => state.red_team.name,
+      "points" => state.red_team.points
+    })
+
+    push_function.("team:update", %{
+      "name" => state.blue_team.name,
+      "points" => state.blue_team.points
+    })
+
+    for {_id, target} <- state.red_team.targets do
       push_function.("target:update:red", %{
         "id" => target.id,
         "coords" => target.coords
       })
     end
 
-    for {_id, target} <- state.blue_targets do
+    for {_id, target} <- state.blue_team.targets do
       push_function.("target:update:blue", %{
         "id" => target.id,
         "coords" => target.coords

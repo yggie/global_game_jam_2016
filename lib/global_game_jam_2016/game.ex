@@ -1,62 +1,46 @@
 defmodule GlobalGameJam_2016.Game do
-  defstruct uid: nil,
-    red_players: %{},
-    blue_players: %{},
-    red_targets: %{},
-    blue_targets: %{}
-
-  defmodule Player do
-    defstruct id: nil, coords: nil, accuracy: nil
-  end
-
-  defmodule Target do
-    defstruct id: nil, coords: nil
-  end
-
   alias GlobalGameJam_2016.Game
+  alias GlobalGameJam_2016.Game.Team
+
+  defstruct uid: nil,
+    red_team: %Team{name: "red"},
+    blue_team: %Team{name: "blue"}
 
   def has_player?(game, player_id) do
-    Map.has_key?(game.blue_players, player_id) || Map.has_key?(game.red_players, player_id)
+    Team.has_player?(game.red_team, player_id) || Team.has_player?(game.blue_team, player_id)
   end
 
   def new_blue_player(game) do
-    player = new_player()
-    game = %Game{game | blue_players: Map.put(game.blue_players, player.id, player)}
-    {player.id, game}
+    {blue_team, player_id} = Team.new_player(game.blue_team)
+    game = %Game{game | blue_team: blue_team}
+    {player_id, game}
   end
 
   def new_red_player(game) do
-    player = new_player()
-    game = %Game{game | red_players: Map.put(game.red_players, player.id, player)}
-    {player.id, game}
+    {red_team, player_id} = Team.new_player(game.red_team)
+    game = %Game{game | red_team: red_team}
+    {player_id, game}
   end
 
-  def update_player(game, id, %{ "coords" => coords , "accuracy" => accuracy }) do
+  def update_player(game, id, location) do
     case team_name_for_player(game, id) do
       "blue" ->
-        player = Map.get(game.blue_players, id)
-        player = %Player{player | coords: coords, accuracy: accuracy}
-        %Game{game | blue_players: Map.put(game.blue_players, id, player)}
+        {blue_team, captured_targets} = Team.update_player(game.blue_team, id, location)
+        {%Game{game | blue_team: blue_team}, {"blue", captured_targets}}
 
       "red" ->
-        player = Map.get(game.red_players, id)
-        player = %Player{player | coords: coords, accuracy: accuracy}
-        %Game{game | red_players: Map.put(game.red_players, id, player)}
+        {red_team, captured_targets} = Team.update_player(game.red_team, id, location)
+        {%Game{game | red_team: red_team}, {"red", captured_targets}}
     end
   end
 
   def team_name_for_player(game, player_id) do
     cond do
-      Map.has_key?(game.blue_players, player_id) ->
+      Team.has_player?(game.blue_team, player_id) ->
         "blue"
 
-      Map.has_key?(game.red_players, player_id) ->
+      Team.has_player?(game.red_team, player_id) ->
         "red"
     end
-  end
-
-  defp new_player do
-    new_player_id = UUID.uuid1()
-    %Game.Player{ id: new_player_id }
   end
 end
