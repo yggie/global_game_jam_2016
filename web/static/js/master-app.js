@@ -24,14 +24,6 @@ masterApp.initialize = function () {
     let sound = new Sound()
     new Chat(channel, sound, 'master')
 
-    let teamName = $("#team-name")
-    let timeLeft = $("#time-left")
-    let cellsCollected = $("#cells-collected")
-
-    teamName.append("Team: " + player.team())
-    timeLeft.append("Time: 10 mins")
-    cellsCollected.append("Energy Cells: 1 of 5 found")
-
     let markers = {};
 
     tracking.once((position) => {
@@ -65,6 +57,7 @@ masterApp.initialize = function () {
       console.log('TEAM POINTS: (', payload.name, ':', payload.points, ')');
     });
 
+    let playerIconPath = 'M17.508 13.941l.492.493c-1.127 1.72-3.199 3.566-5.999 3.566-2.801 0-4.874-1.846-6.001-3.566l.492-.493c1.513 1.195 3.174 1.931 5.509 1.931 2.333 0 3.994-.736 5.507-1.931zm6.492-1.941c0 6.627-5.373 12-12 12s-12-5.373-12-12 5.373-12 12-12 12 5.373 12 12zm-21.159-4h2.51c.564-1.178 1.758-2 3.149-2 1.281 0 2.396.698 3.004 1.729.1.168.28.271.475.271.219 0 .423-.115.536-.302.611-1.014 1.716-1.698 2.985-1.698 1.391 0 2.585.822 3.149 2h2.51c-1.547-3.527-5.068-6-9.159-6s-7.612 2.473-9.159 6zm12.659 0c-.828 0-1.5.671-1.5 1.5s.672 1.5 1.5 1.5 1.5-.671 1.5-1.5-.672-1.5-1.5-1.5zm-7 0c-.828 0-1.5.671-1.5 1.5s.672 1.5 1.5 1.5 1.5-.671 1.5-1.5-.672-1.5-1.5-1.5zm13.5 4c0-.685-.07-1.354-.202-2h-2.849c-.245 1.691-1.691 3-3.449 3-1.552 0-2.454-.878-2.955-1.677-.11-.176-.304-.283-.512-.283-.208.001-.4.109-.51.287-.619 1.008-1.75 1.673-3.023 1.673-1.758 0-3.204-1.309-3.449-3h-2.849c-.132.646-.202 1.315-.202 2 0 5.514 4.486 10 10 10s10-4.486 10-10z';
     function renderPlayer(playerData) {
       if (!map) {
         return;
@@ -76,38 +69,29 @@ masterApp.initialize = function () {
           luminosity: 'light',
           hue: 'random'
         });
-        let center = new google.maps.Circle({
-          strokeColor: color,
-          strokeOpacity: 0.9,
-          strokeWidth: 1.0,
+
+        var playerIcon = {
+          path: playerIconPath,
           fillColor: color,
-          fillOpacity: 0.9,
-          map: map,
-          radius: 2.0,
-          animation: google.maps.Animation.DROP
-        });
-        let radius = new google.maps.Circle({
+          fillOpacity: 0.8,
+          scale: 1.0,
           strokeColor: color,
-          strokeOpacity: 0.8,
-          strokeWidth: 1.0,
-          fillColor: color,
-          fillOpacity: 0.5,
-          map: map,
-          radius: playerData.accuracy,
-          animation: google.maps.Animation.DROP
-        });
-        marker = {
-          center: center,
-          radius: radius
+          strokeWeight: 0.5
         };
+
+        marker = new google.maps.Marker({
+          map: map,
+          icon: playerIcon,
+          animation: google.maps.Animation.DROP
+        });
         markers[playerData.id] = marker;
       }
 
-      marker.center.setCenter(playerData.coords);
-      marker.radius.setCenter(playerData.coords);
+      marker.setPosition(playerData.coords);
     }
 
     let targets = {};
+    let targetPath = 'M14.496 21h-4.932l1.014 2h2.904l1.014-2zm1.811-17.238c-1.407-1.353-3.079-1.297-4.312-3.762-1.245 2.489-2.988 2.359-4.38 3.7-4.024 3.872-1.173 11.401 1.397 16.3h5.977c2.57-4.899 5.443-12.269 1.318-16.238zm-4.307 9.238c-1.657 0-3-1.343-3-3s1.343-3 3-3c1.656 0 3 1.343 3 3s-1.344 3-3 3zm1.5-3c0 .827-.673 1.5-1.5 1.5s-1.5-.673-1.5-1.5.673-1.5 1.5-1.5 1.5.673 1.5 1.5zm-8.801 12.594c.097.31.411 1.406.411 1.406h-1.276s-.801-1.271-1.418-2.368c-.284-.505-.416-.906-.416-1.282 0-.736.507-1.372 1.375-2.483l1.591-2.058c.487 1.358 1.105 2.788 1.854 4.284-.36.212-.975.578-1.27.773-.634.418-1.126.847-.851 1.728zm17.301-2.245c0 .376-.132.778-.416 1.283-.617 1.097-1.418 2.368-1.418 2.368h-1.275s.312-1.096.41-1.406c.275-.881-.217-1.31-.85-1.729-.296-.195-.91-.56-1.271-.772.752-1.5 1.372-2.925 1.859-4.276l1.585 2.05c.869 1.11 1.376 1.746 1.376 2.482z';
     function renderTarget(targetData, color) {
       if (!map) {
         return;
@@ -115,9 +99,17 @@ masterApp.initialize = function () {
 
       let target = targets[targetData.id];
       if (!target) {
+        var energyCell = {
+          path: targetPath,
+          fillColor: color,
+          fillOpacity: 0.8,
+          scale: 1.0,
+          strokeColor: color,
+          strokeWeight: 1
+        };
         target = new google.maps.Marker({
           map: map,
-          icon: (color === 'blue' ? 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png' : 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'),
+          icon: energyCell,
           animation: google.maps.Animation.DROP
         });
         targets[targetData.id] = target;

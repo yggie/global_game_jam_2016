@@ -1,5 +1,21 @@
 import player from './game/player';
 
+player.whenConnected((channel) => {
+  let timeLeft = $("#time-left")
+  let cellsCollected = $("#cells-collected")
+
+  timeLeft.text("Time: 10 mins")
+  cellsCollected.text("Energy Cells: 0 of 5 found")
+
+  channel.on('team:update', (payload) => {
+    if (payload.name === player.team()) {
+      let collected = payload.points;
+      let total = collected + payload.targets_remaining;
+      cellsCollected.text(`Energy Cells: ${collected} of ${total} found`)
+    }
+  });
+});
+
 export class Chat {
   constructor(channel, sound, role) {
     let msgContainer = $('.chat-message-history')

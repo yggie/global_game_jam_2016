@@ -4,40 +4,6 @@
   display: flex;
   -webkit-flex-direction: column;
   flex-direction: column;
-
-  .info-window {
-    padding: 16px;
-    color: white;
-    height: auto;
-
-    p {
-      margin: 0;
-      display: block;
-    }
-  }
-
-  .chat-window {
-    display: flex;
-    -webkit-flex: 1;
-    flex: 1;
-    -webkit-flex-direction: column;
-    flex-direction: column;
-  }
-
-  .chat-message-history {
-    background-color: white;
-    -webkit-flex: 1;
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-
-  .chat-input {
-    -webkit-flex-basis: 0;
-    flex-basis: 0;
-    padding: 0 8px;
-    line-height: 2;
-  }
 }
 
 .red-team .player-page {

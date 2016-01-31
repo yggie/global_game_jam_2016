@@ -1,0 +1,30 @@
+.master-page {
+  height: 100%;
+  display: flex;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+
+  #map {
+    height: 100%;
+    width: 50%;
+    -webkit-flex: 1;
+    flex: 1;
+  }
+
+  .sidebar {
+    height: 100%;
+    -webkit-flex-basis: 300px;
+    flex-basis: 300px;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+  }
+}
+
+.red-team .sidebar {
+  background-color: $red-team-secondary;
+}
+
+.blue-team .sidebar {
+  background-color: $blue-team-secondary;
+}

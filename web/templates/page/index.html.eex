@@ -1,8 +1,15 @@
-<div id="map"></div>
+<div class="master-page">
+  <div id="map"></div>
 
-<div id="sidebar">
-  <div id="chat">
-    <div id="messages"></div>
-    <input id="message-input" placeholder="Send..." />
+  <div class="sidebar">
+    <div class="info-window">
+      <p id="time-left"></p>
+      <p id="cells-collected"></p>
+    </div>
+
+    <div class="chat-window">
+      <div class="chat-message-history"></div>
+      <input class="chat-input" type="text" placeholder="Send..." />
+    </div>
   </div>
 </div>

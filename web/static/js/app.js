@@ -28,6 +28,6 @@ if (window.location.pathname.match(/^\/player/)) {
   masterApp.initialize();
 }
 
-player.whenConnected(() => {
+player.whenConnected((channel) => {
   $(document.body).addClass(`${player.team()}-team`);
 });
