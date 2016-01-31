@@ -48,6 +48,7 @@ masterApp.initialize = function () {
     });
 
     channel.on('target:update:blue', (payload) => {
+      console.log('BLUE TARGET:', payload.coords);
       renderTarget(payload, 'blue');
     });
 

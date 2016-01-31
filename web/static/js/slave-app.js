@@ -30,7 +30,7 @@ slaveApp.initialize = function () {
           lng: position.coords.longitude
         }
       });
-      location = `${position.coords.latitude} ${position.coords.longitude}`
+      location.append(`${position.coords.latitude} ${position.coords.longitude}`);
     });
   });
 };
