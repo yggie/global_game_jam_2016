@@ -21,7 +21,11 @@ html, body, main {
   float: left;
   height: 100%;
   width: 50%;
-  background-color: green;
+  background: #afafaf;
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  display: block;
 }
 
 #open-or-join {
@@ -32,13 +36,18 @@ html, body, main {
 }
 
 #message-input {
+  line-height: 48pt;
   width: 100%;
 }
 
 #messages {
-  height: 800px;
+  height: 600px;
+  padding:0;
+  overflow: scroll; overflow-x:hidden;
+  /*-webkit-overflow-scrolling: touch;*/
+
   background: #efefef;
-  overflow: auto;
+  font-family: Arimo, sans-serif;
 }
 
 #messages > p {
