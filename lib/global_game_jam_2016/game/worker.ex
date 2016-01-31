@@ -5,6 +5,8 @@ defmodule GlobalGameJam_2016.Game.Worker do
 
   @max_offset 0.003
   @min_offset 0.002
+  @seconds_in_game 600
+  @seconds_to_restart 15
 
   def start_link() do
     uuid = UUID.uuid1()
@@ -13,9 +15,8 @@ defmodule GlobalGameJam_2016.Game.Worker do
 
   def init(_uuid) do
     send self, :ping
+    send self, {:second_tick, @seconds_in_game}
 
-    red_target_id = UUID.uuid1()
-    blue_target_id = UUID.uuid1()
     game = %Game{ uid: "public" }
 
     blue_target = %{ "lat" => 50.93726 - 0.07*@min_offset, "lng" => -1.397723 + 0.1*@min_offset }
@@ -141,6 +142,48 @@ defmodule GlobalGameJam_2016.Game.Worker do
     end)
 
     Process.send_after self, :ping, 5000
+    {:noreply, state}
+  end
+
+  def handle_info({:second_tick, remaining_seconds}, state) do
+    blue_channel = channel_name(state, "blue")
+    red_channel = channel_name(state, "red")
+    message = "game-state:update"
+
+    payload = if remaining_seconds <= 0 do
+      Process.send_after self, {:restart_tick, @seconds_to_restart - 1}, 1000
+
+      %{ "state" => "ended", "remaining_time" => 0, "restart_time" => @seconds_to_restart}
+    else
+      Process.send_after self, {:second_tick, remaining_seconds - 1}, 1000
+
+      %{ "state" => "playing", "remaining_time" => remaining_seconds}
+    end
+
+    GlobalGameJam_2016.Endpoint.broadcast!(blue_channel, message, payload)
+    GlobalGameJam_2016.Endpoint.broadcast!(red_channel, message, payload)
+
+    {:noreply, state}
+  end
+
+  def handle_info({:restart_tick, remaining_seconds}, state) do
+    blue_channel = channel_name(state, "blue")
+    red_channel = channel_name(state, "red")
+    message = "game-state:update"
+
+    payload = if remaining_seconds <= 0 do
+      Process.send_after self, {:second_tick, @seconds_in_game - 1}, 1000
+
+      %{"state" => "playing", "remaining_time" => @seconds_in_game}
+    else
+      Process.send_after self, {:restart_tick, remaining_seconds - 1}, 1000
+
+      %{"state" => "ended", "remaining_time" => 0, "restart_time" => remaining_seconds}
+    end
+
+    GlobalGameJam_2016.Endpoint.broadcast!(blue_channel, message, payload)
+    GlobalGameJam_2016.Endpoint.broadcast!(red_channel, message, payload)
+
     {:noreply, state}
   end
 

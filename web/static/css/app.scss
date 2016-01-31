@@ -14,6 +14,40 @@ html, body, main {
   padding: 0;
 }
 
+.scoreboard {
+  font-size: 1.5em;
+  display: flex;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+  margin-bottom: 8px;
+
+  .blue-team-score {
+    font-weight: 100;
+    -webkit-flex: 1;
+    flex: 1;
+    color: white;
+    text-align: left;
+    background-color: $blue-team-primary;
+    padding: 0 8px;
+  }
+
+  .red-team-score {
+    font-weight: 100;
+    -webkit-flex: 1;
+    flex: 1;
+    color: white;
+    text-align: right;
+    background-color: $red-team-primary;
+    padding: 0 8px;
+  }
+
+  .time-left {
+    -webkit-flex: 1;
+    flex: 1;
+    text-align: center;
+  }
+}
+
 .info-window {
   padding: 16px;
   color: white;
@@ -45,8 +79,8 @@ html, body, main {
 }
 
 .chat-input {
-  -webkit-flex-basis: 0;
-  flex-basis: 0;
+  -webkit-flex-basis: 40px;
+  flex-basis: 40px;
   padding: 0 8px;
   line-height: 2;
 }

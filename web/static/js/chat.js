@@ -1,11 +1,10 @@
 import player from './game/player';
 
 player.whenConnected((channel) => {
-  let timeLeft = $("#time-left")
+  let blueTeamScore = $('.blue-team-score');
+  let redTeamScore = $('.red-team-score');
+  let timeLeft = $(".time-left")
   let cellsCollected = $("#cells-collected")
-
-  timeLeft.text("Time: 10 mins")
-  cellsCollected.text("Energy Cells: 0 of 5 found")
 
   channel.on('team:update', (payload) => {
     if (payload.name === player.team()) {
@@ -13,7 +12,30 @@ player.whenConnected((channel) => {
       let total = collected + payload.targets_remaining;
       cellsCollected.text(`Energy Cells: ${collected} of ${total} found`)
     }
+
+    if (payload.name === 'blue') {
+      blueTeamScore.text(payload.points);
+    } else {
+      redTeamScore.text(payload.points);
+    }
   });
+
+  channel.on('game-state:update', (payload) => {
+    if (payload.state === 'playing') {
+      let seconds = Math.floor(payload.remaining_time + 0.0001);
+      let minutes = Math.floor(seconds / 60 + 0.0001);
+      timeLeft.text(`${pad(minutes, 2)}:${pad(seconds % 60, 2)}`)
+    } else {
+      let seconds = Math.floor(payload.restart_time + 0.0001);
+      let minutes = Math.floor(seconds / 60 + 0.0001);
+      timeLeft.text(`Restarting in: ${pad(minutes, 2)}:${pad(seconds % 60, 2)}`)
+    }
+  });
+
+  function pad(num, size) {
+    var s = '000000000' + num;
+    return s.substr(s.length-size);
+  }
 });
 
 export class Chat {

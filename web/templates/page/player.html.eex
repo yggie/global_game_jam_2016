@@ -1,6 +1,10 @@
 <div class="player-page">
   <div class="info-window">
-    <p id="time-left"></p>
+    <div class="scoreboard">
+      <span class="blue-team-score">0</span>
+      <span class="time-left">00:00</span>
+      <span class="red-team-score">0</span>
+    </div>
     <p id="cells-collected"></p>
     <p id="location"></p>
   </div>
