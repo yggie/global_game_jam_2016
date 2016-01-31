@@ -20,7 +20,7 @@ defmodule GlobalGameJam_2016.Game.Worker do
     game = %Game{game | blue_team: %Game.Team{game.blue_team | targets: %{
           blue_target_id => %{
             id: blue_target_id,
-            coords: %{ "lat" => 50.93726 + 0.2*@min_offset, "lng" => -1.397723 }
+            coords: %{ "lat" => 50.93726 - 0.07*@min_offset, "lng" => -1.397723 + 0.1*@min_offset }
           }
         }
       }
@@ -28,7 +28,7 @@ defmodule GlobalGameJam_2016.Game.Worker do
     game = %Game{game | red_team: %Game.Team{game.red_team | targets: %{
           red_target_id => %{
             id: red_target_id,
-            coords: %{ "lat" => 50.93724, "lng" => -1.397723 }
+            coords: %{ "lat" => 50.93724 + 0.2*@min_offset, "lng" => -1.397723 }
           }
         }
       }
