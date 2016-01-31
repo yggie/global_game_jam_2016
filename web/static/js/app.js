@@ -30,4 +30,12 @@ if (window.location.pathname.match(/^\/player/)) {
 
 player.whenConnected((channel) => {
   $(document.body).addClass(`${player.team()}-team`);
+
+  channel.on('target:captured', () => {
+    $(document.body).addClass('shake');
+
+    setTimeout(() => {
+      $(document.body).removeClass('shake');
+    }, 1000);
+  });
 });
