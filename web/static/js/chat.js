@@ -10,7 +10,7 @@ player.whenConnected((channel) => {
     if (payload.name === player.team()) {
       let collected = payload.points;
       let total = collected + payload.targets_remaining;
-      cellsCollected.text(`Energy Cells: ${collected} of ${total} found`)
+      cellsCollected.text(`${collected} of ${total} found`)
     }
 
     if (payload.name === 'blue') {

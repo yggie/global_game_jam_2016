@@ -6,6 +6,7 @@
       <span class="red-team-score">0</span>
     </div>
     <p id="cells-collected"></p>
+    <p id="distance"></p>
     <p id="location"></p>
   </div>
 
