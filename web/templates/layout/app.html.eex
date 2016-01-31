@@ -13,6 +13,7 @@
 
   <body>
     <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script src="//cdn.temasys.com.sg/adapterjs/0.10.x/adapter.debug.js"></script>
     <main role="main">
       <%= render @view_module, @view_template, assigns %>
     </main>

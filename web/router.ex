@@ -17,6 +17,7 @@ defmodule GlobalGameJam_2016.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
+    get "/call", CallController, :index
     get "/player", PageController, :player
   end
 

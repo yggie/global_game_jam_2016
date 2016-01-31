@@ -20,6 +20,7 @@ import "phoenix_html"
 
 import slaveApp from './slave-app';
 import masterApp from './master-app';
+import callApp from './call'
 
 if (window.location.pathname.match(/^\/player/)) {
   slaveApp.initialize();

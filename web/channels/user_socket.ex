@@ -3,6 +3,7 @@ defmodule GlobalGameJam_2016.UserSocket do
 
   ## Channels
   channel "game:*", GlobalGameJam_2016.GameChannel
+  channel "call", GlobalGameJam_2016.CallChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
