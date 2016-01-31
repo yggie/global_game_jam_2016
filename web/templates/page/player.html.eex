@@ -1,11 +1,12 @@
-<span id="team-name"></span>
-<span id="time-left"></span>
-<span id="cells-collected"></span>
-<span id="location"></span>
+<div class="player-page">
+  <div class="info-window">
+    <p id="time-left"></p>
+    <p id="cells-collected"></p>
+    <p id="location"></p>
+  </div>
 
-<hr />
-
-<div id="chat">
-  <div id="messages"></div>
-  <input id="message-input" placeholder="Send..." />
+  <div class="chat-window">
+    <div class="chat-message-history"></div>
+    <input class="chat-input" type="text" placeholder="Send..." />
+  </div>
 </div>

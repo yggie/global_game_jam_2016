@@ -20,9 +20,14 @@ import "phoenix_html"
 
 import slaveApp from './slave-app';
 import masterApp from './master-app';
+import player from './game/player';
 
 if (window.location.pathname.match(/^\/player/)) {
   slaveApp.initialize();
 } else {
   masterApp.initialize();
 }
+
+player.whenConnected(() => {
+  $(document.body).addClass(`${player.team()}-team`);
+});

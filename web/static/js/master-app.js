@@ -22,7 +22,7 @@ let masterApp = {};
 masterApp.initialize = function () {
   player.connect().then((channel) => {
     let sound = new Sound()
-    new Chat(channel, sound)
+    new Chat(channel, sound, 'master')
 
     let teamName = $("#team-name")
     let timeLeft = $("#time-left")

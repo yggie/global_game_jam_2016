@@ -4,6 +4,8 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 @import "./vendor/normalize";
+@import "./colors";
+@import "./player-page";
 
 html, body, main {
   height: 100%;
@@ -30,31 +32,4 @@ html, body, main {
 
 #open-or-join {
   width: 100%;
-}
-
-#chat {
-}
-
-#message-input {
-  line-height: 48pt;
-  width: 100%;
-}
-
-#messages {
-  height: 300px;
-  padding:0;
-  overflow: scroll; overflow-x:hidden;
-  /*-webkit-overflow-scrolling: touch;*/
-
-  background: #efefef;
-  font-family: Arimo, sans-serif;
-}
-
-#messages > p {
-  line-height: 12pt;
-  padding: 0;
-}
-
-.message {
-  color: red;
 }

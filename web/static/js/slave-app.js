@@ -8,18 +8,24 @@ let slaveApp = {};
 slaveApp.initialize = function () {
   player.connect().then((channel) => {
     let sound = new Sound()
-    new Chat(channel, sound)
+    new Chat(channel, sound, 'slave')
 
-    let teamName = $("#team-name")
     let location = $("#location")
     let timeLeft = $("#time-left")
     let cellsCollected = $("#cells-collected")
 
-    teamName.append("Team: " + player.team())
-    timeLeft.append("Time: 10 mins")
-    cellsCollected.append("Energy Cells: 1 of 5 found")
+    timeLeft.text("Time: 10 mins")
+    cellsCollected.text("Energy Cells: 0 of 5 found")
 
-    $(document.body).css('background-color', player.team());
+    let collected = 0;
+    let total = 0;
+    channel.on('team:update', (payload) => {
+      if (payload.name === player.team()) {
+        collected = payload.points;
+        total = collected + payload.targets_remaining;
+        cellsCollected.text(`Energy Cells: ${collected} of ${total} found`)
+      }
+    });
 
     tracking.start((position) => {
       channel.push('location', {
@@ -30,7 +36,7 @@ slaveApp.initialize = function () {
           lng: position.coords.longitude
         }
       });
-      location.text(`${position.coords.latitude} ${position.coords.longitude}`);
+      location.text(`${position.coords.latitude.toFixed(8)} ${position.coords.longitude.toFixed(8)}`);
     });
   });
 };

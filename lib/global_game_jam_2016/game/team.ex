@@ -22,6 +22,10 @@ defmodule GlobalGameJam_2016.Game.Team do
     team.players |> Map.keys |> Enum.count
   end
 
+  def number_of_targets(team) do
+    team.targets |> Map.keys |> Enum.count
+  end
+
   def update_player(team, id, %{ "coords" => coords , "accuracy" => accuracy }) do
     player = team.players[id]
     player = %Player{player | coords: coords, accuracy: accuracy}

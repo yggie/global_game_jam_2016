@@ -35,8 +35,16 @@ player.connect = function () {
   return playerConnectDeferred.promise;
 };
 
+player.whenConnected = function (callback) {
+  return playerConnectDeferred.promise.then(callback);
+};
+
 player.id = function () {
   return Cookies.get('player_id');
+};
+
+player.nick = function () {
+  return this.id().substring(0, 2);
 };
 
 player.team = function() {

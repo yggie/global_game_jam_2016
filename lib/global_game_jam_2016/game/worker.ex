@@ -159,12 +159,16 @@ defmodule GlobalGameJam_2016.Game.Worker do
   defp push_shared_state(state, push_function, players) do
     push_function.("team:update", %{
       "name" => state.red_team.name,
-      "points" => state.red_team.points
+      "points" => state.red_team.points,
+      "team_size": Game.Team.size(state.red_team),
+      "targets_remaining": Game.Team.number_of_targets(state.red_team)
     })
 
     push_function.("team:update", %{
       "name" => state.blue_team.name,
-      "points" => state.blue_team.points
+      "points" => state.blue_team.points,
+      "team_size": Game.Team.size(state.blue_team),
+      "targets_remaining": Game.Team.number_of_targets(state.blue_team)
     })
 
     for {_id, target} <- state.red_team.targets do
