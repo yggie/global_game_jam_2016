@@ -1,6 +1,7 @@
-<h1 id="team-name"></h1>
-<h2 id="time-left"></h2>
-<h2 id="cells-collected"></h2>
+<span id="team-name"></span>
+<span id="time-left"></span>
+<span id="cells-collected"></span>
+<span id="location"></span>
 
 <hr />
 
