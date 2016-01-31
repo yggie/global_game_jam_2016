@@ -11,6 +11,8 @@ window.initMap = () => {
   map = new google.maps.Map(document.getElementById('map'), {
     center: { lat: 50.9372123, lng: -1.3977227 },
     styles: googleMapsStyle,
+    mapTypeControl: false,
+    streetViewControl: false,
     zoom: 17
   });
 };
